@@ -98,7 +98,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
   ip_protocol       = "-1" 
 }
 output "ec2-1-public-ip" {
-    value = aws_intance.ec2-1.public_ip
+    value = aws_instance.ec2-1.public_ip
   
 }
 
