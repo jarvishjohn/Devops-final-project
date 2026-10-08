@@ -57,6 +57,11 @@ resource "aws_instance" "ec2-1" {
   subnet_id = aws_subnet.public-1.id
   vpc_security_group_ids = [ aws_security_group.sg-1.id ]
   associate_public_ip_address = true
+  user_data = <<-EOF
+  #!/bin/bash
+  apt update -y
+  apt install -y docker.io
+  EOF
 
   tags = {
     Name = "Ec2-az1"
