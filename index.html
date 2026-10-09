@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEURAL//OS — Command Center</title>
+
+<style>
+/* =========================================================
+   NEURAL//OS
+   Pure HTML + CSS + JS
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --bg: #050608;
+    --panel: rgba(11, 13, 17, .78);
+    --panel-2: rgba(17, 20, 26, .8);
+    --border: rgba(255,255,255,.08);
+    --text: #e9edf2;
+    --muted: #737b88;
+    --green: #8dff65;
+    --cyan: #5ce1ff;
+    --purple: #a979ff;
+    --red: #ff5577;
+    --yellow: #ffd166;
+    --radius: 18px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, sans-serif;
+    overflow-x: hidden;
+}
+
+/* ================= BACKGROUND ================= */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    background:
+        radial-gradient(circle at 15% 15%, rgba(92,225,255,.09), transparent 25%),
+        radial-gradient(circle at 80% 20%, rgba(169,121,255,.08), transparent 25%),
+        radial-gradient(circle at 50% 100%, rgba(141,255,101,.05), transparent 30%),
+        #050608;
+}
+
+.grid {
+    position: fixed;
+    inset: 0;
+    z-index: -4;
+    opacity: .18;
+    background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+    background-size: 45px 45px;
+    mask-image: linear-gradient(to bottom, black, transparent 90%);
+}
+
+.scanlines {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: .025;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        white 3px
+    );
+}
+
+#particles {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    pointer-events: none;
+}
+
+/* ================= HEADER ================= */
+
+header {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(5,6,8,.72);
+    backdrop-filter: blur(22px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.logo-mark {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(141,255,101,.35);
+    background: rgba(141,255,101,.05);
+    color: var(--green);
+    border-radius: 9px;
+    box-shadow: 0 0 30px rgba(141,255,101,.08);
+}
+
+.logo span {
+    color: var(--muted);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font: 500 12px "JetBrains Mono";
+    color: var(--muted);
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--green);
+    animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+    50% { opacity: .3; transform: scale(.7); }
+}
+
+.avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg,#17251a,#0d1115);
+    color: var(--green);
+    font-family: "JetBrains Mono";
+}
+
+/* ================= LAYOUT ================= */
+
+.app {
+    width: min(1800px, 100%);
+    margin: auto;
+    padding: 28px;
+}
+
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 26px;
+}
+
+.eyebrow {
+    font: 600 11px "JetBrains Mono";
+    color: var(--green);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.hero h1 {
+    font-size: clamp(32px, 4vw, 58px);
+    letter-spacing: -3px;
+    line-height: .95;
+}
+
+.hero h1 span {
+    color: var(--muted);
+}
+
+.hero-meta {
+    text-align: right;
+    font: 11px "JetBrains Mono";
+    color: var(--muted);
+    line-height: 1.8;
+}
+
+/* ================= KPI ================= */
+
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.card {
+    background: linear-gradient(
+        145deg,
+        rgba(255,255,255,.045),
+        rgba(255,255,255,.015)
+    );
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(20px);
+    box-shadow: inset 0 1px rgba(255,255,255,.025);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        120deg,
+        transparent 40%,
+        rgba(255,255,255,.025),
+        transparent 60%
+    );
+    transform: translateX(-100%);
+    transition: .8s;
+}
+
+.card:hover::before {
+    transform: translateX(100%);
+}
+
+.metric {
+    padding: 20px;
+}
+
+.metric-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.metric-label {
+    color: var(--muted);
+    font: 11px "JetBrains Mono";
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.metric-icon {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: rgba(255,255,255,.04);
+    color: var(--cyan);
+}
+
+.metric-value {
+    margin-top: 14px;
+    font: 600 30px "JetBrains Mono";
+    letter-spacing: -2px;
+}
+
+.metric-change {
+    margin-top: 8px;
+    font: 10px "JetBrains Mono";
+    color: var(--green);
+}
+
+/* ================= MAIN GRID ================= */
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1.65fr 1fr 1fr;
+    grid-template-rows: 360px 310px;
+    gap: 14px;
+}
+
+.panel {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-head {
+    height: 58px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font: 600 11px "JetBrains Mono";
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.panel-title::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan);
+    border-radius: 50%;
+}
+
+.panel-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3b414a;
+}
+
+.panel-body {
+    flex: 1;
+    padding: 18px;
+    min-height: 0;
+}
+
+/* ================= CHART ================= */
+
+.chart-panel {
+    grid-row: span 1;
+}
+
+.chart-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+.chart-big {
+    font: 600 31px "JetBrains Mono";
+}
+
+.chart-small {
+    font: 10px "JetBrains Mono";
+    color: var(--green);
+}
+
+.chart {
+    height: calc(100% - 65px);
+    position: relative;
+}
+
+.chart svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.chart-grid {
+    stroke: rgba(255,255,255,.05);
+    stroke-width: 1;
+}
+
+.chart-line {
+    fill: none;
+    stroke: var(--cyan);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 7px rgba(92,225,255,.45));
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw 2s forwards;
+}
+
+@keyframes draw {
+    to { stroke-dashoffset: 0; }
+}
+
+.chart-area {
+    fill: url(#gradient);
+    opacity: .16;
+}
+
+/* ================= TERMINAL ================= */
+
+.terminal {
+    font: 11px "JetBrains Mono";
+    height: 100%;
+    overflow: auto;
+    line-height: 1.8;
+}
+
+.terminal::-webkit-scrollbar {
+    width: 4px;
+}
+
+.terminal::-webkit-scrollbar-thumb {
+    background: #252a31;
+}
+
+.term-line {
+    display: flex;
+    gap: 8px;
+}
+
+.term-time {
+    color: #414750;
+}
+
+.term-prompt {
+    color: var(--green);
+}
+
+.term-text {
+    color: #aab1ba;
+}
+
+.term-success {
+    color: var(--green);
+}
+
+.term-warning {
+    color: var(--yellow);
+}
+
+.term-error {
+    color: var(--red);
+}
+
+.command-box {
+    display: flex;
+    margin-top: 10px;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+}
+
+.command-box span {
+    color: var(--green);
+}
+
+.command-box input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: white;
+    font: 11px "JetBrains Mono";
+    margin-left: 8px;
+}
+
+/* ================= ACTIVITY ================= */
+
+.activity {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    overflow: auto;
+}
+
+.activity-item {
+    display: flex;
+    gap: 11px;
+}
+
+.activity-icon {
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+}
+
+.activity-text {
+    min-width: 0;
+}
+
+.activity-title {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.activity-sub {
+    margin-top: 3px;
+    color: var(--muted);
+    font: 9px "JetBrains Mono";
+}
+
+/* ================= SYSTEM ================= */
+
+.system-row {
+    margin-bottom: 17px;
+}
+
+.system-label {
+    display: flex;
+    justify-content: space-between;
+    font: 10px "JetBrains Mono";
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.bar {
+    height: 5px;
+    background: rgba(255,255,255,.05);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.bar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--cyan);
+    box-shadow: 0 0 10px rgba(92,225,255,.4);
+    transition: width 1s cubic-bezier(.2,.8,.2,1);
+}
+
+/* ================= NETWORK ================= */
+
+.network {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.node {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 15px var(--green);
+}
+
+.node:nth-child(1) { left: 20%; top: 30%; }
+.node:nth-child(2) { left: 55%; top: 18%; }
+.node:nth-child(3) { left: 75%; top: 55%; }
+.node:nth-child(4) { left: 35%; top: 75%; }
+.node:nth-child(5) { left: 85%; top: 25%; }
+.node:nth-child(6) { left: 12%; top: 65%; }
+
+.network svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.network line {
+    stroke: rgba(141,255,101,.15);
+    stroke-width: 1;
+    stroke-dasharray: 4 8;
+    animation: networkFlow 2s linear infinite;
+}
+
+@keyframes networkFlow {
+    to { stroke-dashoffset: -20; }
+}
+
+/* ================= MINI CARDS ================= */
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.tag {
+    padding: 7px 9px;
+    border-radius: 7px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--border);
+    font: 9px "JetBrains Mono";
+    color: var(--muted);
+}
+
+.tag.active {
+    color: var(--green);
+    border-color: rgba(141,255,101,.25);
+    background: rgba(141,255,101,.05);
+}
+
+/* ================= COMMAND PALETTE ================= */
+
+.command-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: none;
+    place-items: start center;
+    padding-top: 15vh;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(12px);
+}
+
+.command-overlay.active {
+    display: grid;
+}
+
+.command-modal {
+    width: min(650px, calc(100% - 30px));
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: #0b0d11;
+    box-shadow: 0 30px 100px rgba(0,0,0,.7);
+    overflow: hidden;
+}
+
+.command-search {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.command-search span {
+    color: var(--green);
+    font-family: "JetBrains Mono";
+}
+
+.command-search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: white;
+    font: 13px "JetBrains Mono";
+}
+
+.commands {
+    padding: 8px;
+}
+
+.command {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.command:hover {
+    background: rgba(255,255,255,.05);
+}
+
+.command kbd {
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 3px 6px;
+    border-radius: 5px;
+    font: 9px "JetBrains Mono";
+}
+
+/* ================= FOOTER ================= */
+
+footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    color: #3d434c;
+    font: 9px "JetBrains Mono";
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1100px) {
+    .dashboard {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 360px 300px 300px;
+    }
+
+    .chart-panel {
+        grid-column: span 2;
+    }
+}
+
+@media(max-width:700px) {
+    header {
+        padding: 0 15px;
+    }
+
+    .header-right .status {
+        display: none;
+    }
+
+    .app {
+        padding: 15px;
+    }
+
+    .hero {
+        display: block;
+    }
+
+    .hero-meta {
+        text-align: left;
+        margin-top: 15px;
+    }
+
+    .metrics {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .dashboard {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel {
+        min-height: 320px;
+    }
+
+    .chart-panel {
+        min-height: 400px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="grid"></div>
+<canvas id="particles"></canvas>
+<div class="scanlines"></div>
+
+<header>
+
+    <div class="logo">
+        <div class="logo-mark">N</div>
+        NEURAL<span>//OS</span>
+    </div>
+
+    <div class="header-right">
+
+        <div class="status">
+            <div class="status-dot"></div>
+            ALL SYSTEMS NOMINAL
+        </div>
+
+        <div id="clock" class="status">
+            00:00:00
+        </div>
+
+        <div class="avatar">
+            J
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="app">
+
+    <section class="hero">
+
+        <div>
+            <div class="eyebrow">COMMAND CENTER / 07</div>
+
+            <h1>
+                Welcome back,<br>
+                <span>operator.</span>
+            </h1>
+        </div>
+
+        <div class="hero-meta">
+            SESSION: 9F3A-77C1<br>
+            REGION: AP-SOUTH-1<br>
+            SECURITY: <span style="color:var(--green)">MAXIMUM</span>
+        </div>
+
+    </section>
+
+
+    <!-- ================= METRICS ================= -->
+
+    <section class="metrics">
+
+        <div class="card metric">
+
+            <div class="metric-top">
+                <div class="metric-label">Neural Load</div>
+                <div class="metric-icon">◈</div>
+            </div>
+
+            <div class="metric-value" id="load">73.4%</div>
+
+            <div class="metric-change">
+                ▲ 4.8% from last cycle
+            </div>
+
+        </div>
+
+
+        <div class="card metric">
+
+            <div class="metric-top">
+                <div class="metric-label">Requests</div>
+                <div class="metric-icon">↯</div>
+            </div>
+
+            <div class="metric-value" id="requests">
+                284,921
+            </div>
+
+            <div class="metric-change">
+                ▲ 18.2% this hour
+            </div>
+
+        </div>
+
+
+        <div class="card metric">
+
+            <div class="metric-top">
+                <div class="metric-label">Threat Level</div>
+                <div class="metric-icon">⌁</div>
+            </div>
+
+            <div class="metric-value" style="color:var(--green)">
+                LOW
+            </div>
+
+            <div class="metric-change">
+                0 active incidents
+            </div>
+
+        </div>
+
+
+        <div class="card metric">
+
+            <div class="metric-top">
+                <div class="metric-label">Uptime</div>
+                <div class="metric-icon">◷</div>
+            </div>
+
+            <div class="metric-value">
+                99.998%
+            </div>
+
+            <div class="metric-change">
+                +0.003% this month
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= DASHBOARD ================= -->
+
+    <section class="dashboard">
+
+
+        <!-- CHART -->
+
+        <div class="card panel chart-panel">
+
+            <div class="panel-head">
+
+                <div class="panel-title">
+                    Neural Throughput
+                </div>
+
+                <div class="panel-actions">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+
+            </div>
+
+            <div class="panel-body">
+
+                <div class="chart-info">
+
+                    <div>
+                        <div class="chart-big" id="throughput">
+                            84.29 TB
+                        </div>
+
+                        <div class="metric-label">
+                            processed / 24h
+                        </div>
+                    </div>
+
+                    <div class="chart-small">
+                        LIVE ▲ 12.4%
+                    </div>
+
+                </div>
+
+                <div class="chart">
+
+                    <svg viewBox="0 0 800 250"
+                         preserveAspectRatio="none">
+
+                        <defs>
+
+                            <linearGradient
+                                id="gradient"
+                                x1="0"
+                                x2="0"
+                                y1="0"
+                                y2="1">
+
+                                <stop
+                                    offset="0%"
+                                    stop-color="#5ce1ff"/>
+
+                                <stop
+                                    offset="100%"
+                                    stop-color="#5ce1ff"
+                                    stop-opacity="0"/>
+
+                            </linearGradient>
+
+                        </defs>
+
+                        <g>
+
+                            <line
+                                x1="0"
+                                y1="40"
+                                x2="800"
+                                y2="40"
+                                class="chart-grid"/>
+
+                            <line
+                                x1="0"
+                                y1="100"
+                                x2="800"
+                                y2="100"
+                                class="chart-grid"/>
+
+                            <line
+                                x1="0"
+                                y1="160"
+                                x2="800"
+                                y2="160"
+                                class="chart-grid"/>
+
+                            <line
+                                x1="0"
+                                y1="220"
+                                x2="800"
+                                y2="220"
+                                class="chart-grid"/>
+
+                        </g>
+
+                        <path
+                            class="chart-area"
+                            d="
+                            M0 190
+                            C60 170 80 180 120 140
+                            C160 100 190 160 230 130
+                            C270 100 300 115 330 80
+                            C360 45 390 120 430 100
+                            C470 80 500 110 530 65
+                            C560 20 590 75 620 50
+                            C650 25 680 85 710 65
+                            C740 45 770 50 800 20
+                            L800 250
+                            L0 250
+                            Z"/>
+
+                        <path
+                            class="chart-line"
+                            d="
+                            M0 190
+                            C60 170 80 180 120 140
+                            C160 100 190 160 230 130
+                            C270 100 300 115 330 80
+                            C360 45 390 120 430 100
+                            C470 80 500 110 530 65
+                            C560 20 590 75 620 50
+                            C650 25 680 85 710 65
+                            C740 45 770 50 800 20"/>
+                    </svg>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TERMINAL -->
+
+        <div class="card panel">
+
+            <div class="panel-head">
+
+                <div class="panel-title">
+                    Neural Terminal
+                </div>
+
+                <div class="status">
+                    <div class="status-dot"></div>
+                    ONLINE
+                </div>
+
+            </div>
+
+            <div class="panel-body">
+
+                <div class="terminal" id="terminal">
+
+                    <div class="term-line">
+                        <span class="term-time">00:01:21</span>
+                        <span class="term-prompt">></span>
+                        <span class="term-success">
+                            kernel initialized
+                        </span>
+                    </div>
+
+                    <div class="term-line">
+                        <span class="term-time">00:01:22</span>
+                        <span class="term-prompt">></span>
+                        <span class="term-text">
+                            loading neural modules...
+                        </span>
+                    </div>
+
+                    <div class="term-line">
+                        <span class="term-time">00:01:23</span>
+                        <span class="term-prompt">></span>
+                        <span class="term-success">
+                            48 modules loaded
+                        </span>
+                    </div>
+
+                    <div class="term-line">
+                        <span class="term-time">00:01:25</span>
+                        <span class="term-prompt">></span>
+                        <span class="term-warning">
+                            memory optimization triggered
+                        </span>
+                    </div>
+
+                    <div class="term-line">
+                        <span class="term-time">00:01:27</span>
+                        <span class="term-prompt">></span>
+                        <span class="term-success">
+                            optimization complete
+                        </span>
+                    </div>
+
+                    <div class="term-line">
+                        <span class="term-time">00:01:29</span>
+                        <span class="term-prompt">></span>
+                        <span class="term-text">
+                            waiting for command...
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="command-box">
+
+                    <span>root@neural:~$</span>
+
+                    <input
+                        id="terminalInput"
+                        placeholder="type a command..."
+                        autocomplete="off"/>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIVITY -->
+
+        <div class="card panel">
+
+            <div class="panel-head">
+
+                <div class="panel-title">
+                    Activity Stream
+                </div>
+
+                <div class="metric-label">
+                    REALTIME
+                </div>
+
+            </div>
+
+            <div class="panel-body">
+
+                <div class="activity" id="activity">
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            ↯
+                        </div>
+
+                        <div class="activity-text">
+
+                            <div class="activity-title">
+                                Traffic spike detected
+                            </div>
+
+                            <div class="activity-sub">
+                                edge-node-07 · 2 sec ago
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            ✓
+                        </div>
+
+                        <div class="activity-text">
+
+                            <div class="activity-title">
+                                Deployment completed
+                            </div>
+
+                            <div class="activity-sub">
+                                neural-api v4.8.2 · 18 sec ago
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            ◈
+                        </div>
+
+                        <div class="activity-text">
+
+                            <div class="activity-title">
+                                Model retrained
+                            </div>
+
+                            <div class="activity-sub">
+                                accuracy 98.72% · 41 sec ago
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="activity-item">
+
+                        <div class="activity-icon">
+                            !
+                        </div>
+
+                        <div class="activity-text">
+
+                            <div class="activity-title">
+                                Unusual request pattern
+                            </div>
+
+                            <div class="activity-sub">
+                                edge-node-12 · 1 min ago
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SYSTEM -->
+
+        <div class="card panel">
+
+            <div class="panel-head">
+
+                <div class="panel-title">
+                    System Resources
+                </div>
+
+                <div class="metric-label">
+                    NODE 01
+                </div>
+
+            </div>
+
+            <div class="panel-body">
+
+                <div class="system-row">
+
+                    <div class="system-label">
+                        <span>CPU</span>
+                        <span id="cpuText">68%</span>
+                    </div>
+
+                    <div class="bar">
+                        <span id="cpuBar" style="width:68%"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="system-row">
+
+                    <div class="system-label">
+                        <span>MEMORY</span>
+                        <span id="ramText">74%</span>
+                    </div>
+
+                    <div class="bar">
+                        <span
+                            id="ramBar"
+                            style="width:74%"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="system-row">
+
+                    <div class="system-label">
+                        <span>GPU</span>
+                        <span id="gpuText">91%</span>
+                    </div>
+
+                    <div class="bar">
+                        <span
+                            id="gpuBar"
+                            style="width:91%"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="system-row">
+
+                    <div class="system-label">
+                        <span>STORAGE</span>
+                        <span>42%</span>
+                    </div>
+
+                    <div class="bar">
+                        <span style="width:42%"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="tags">
+
+                    <div class="tag active">
+                        API
+                    </div>
+
+                    <div class="tag active">
+                        DATABASE
+                    </div>
+
+                    <div class="tag active">
+                        REDIS
+                    </div>
+
+                    <div class="tag">
+                        GPU
+                    </div>
+
+                    <div class="tag active">
+                        AUTH
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NETWORK -->
+
+        <div class="card panel">
+
+            <div class="panel-head">
+
+                <div class="panel-title">
+                    Neural Network
+                </div>
+
+                <div class="metric-label">
+                    6 NODES
+                </div>
+
+            </div>
+
+            <div class="panel-body">
+
+                <div class="network">
+
+                    <svg viewBox="0 0 500 250"
+                         preserveAspectRatio="none">
+
+                        <line x1="20%" y1="30%"
+                              x2="55%" y2="18%"/>
+
+                        <line x1="55%" y1="18%"
+                              x2="75%" y2="55%"/>
+
+                        <line x1="75%" y1="55%"
+                              x2="35%" y2="75%"/>
+
+                        <line x1="35%" y1="75%"
+                              x2="12%" y2="65%"/>
+
+                        <line x1="12%" y1="65%"
+                              x2="20%" y2="30%"/>
+
+                        <line x1="55%" y1="18%"
+                              x2="85%" y2="25%"/>
+
+                        <line x1="85%" y1="25%"
+                              x2="75%" y2="55%"/>
+
+                    </svg>
+
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+                    <div class="node"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SECURITY -->
+
+        <div class="card panel">
+
+            <div class="panel-head">
+
+                <div class="panel-title">
+                    Security Matrix
+                </div>
+
+                <div
+                    style="
+                    color:var(--green);
+                    font:10px 'JetBrains Mono'">
+                    SECURE
+                </div>
+
+            </div>
+
+            <div class="panel-body">
+
+                <div class="system-row">
+
+                    <div class="system-label">
+                        <span>FIREWALL</span>
+                        <span>100%</span>
+                    </div>
+
+                    <div class="bar">
+                        <span style="width:100%"></span>
+                    </div>
+
+                </div>
+
+                <div class="system-row">
+
+                    <div class="system-label">
+                        <span>ENCRYPTION</span>
+                        <span>100%</span>
+                    </div>
+
+                    <div class="bar">
+                        <span style="width:100%"></span>
+                    </div>
+
+                </div>
+
+                <div class="system-row">
+
+                    <div class="system-label">
+                        <span>IDENTITY</span>
+                        <span>97%</span>
+                    </div>
+
+                    <div class="bar">
+                        <span style="width:97%"></span>
+                    </div>
+
+                </div>
+
+                <div class="system-row">
+
+                    <div class="system-label">
+                        <span>ANOMALY DETECTION</span>
+                        <span>94%</span>
+                    </div>
+
+                    <div class="bar">
+                        <span style="width:94%"></span>
+                    </div>
+
+                </div>
+
+                <div
+                    style="
+                    padding:12px;
+                    border-radius:10px;
+                    border:1px solid rgba(141,255,101,.15);
+                    background:rgba(141,255,101,.03);
+                    font:9px 'JetBrains Mono';
+                    color:var(--muted);">
+
+                    <span style="color:var(--green)">
+                        ●
+                    </span>
+
+                    Zero active security incidents.
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer>
+
+        <span>NEURAL//OS v4.8.2</span>
+
+        <span>
+            PRESS <b style="color:#737b88">CTRL + K</b>
+            FOR COMMAND PALETTE
+        </span>
+
+        <span>
+            BUILD 7F3A91
+        </span>
+
+    </footer>
+
+</main>
+
+
+<!-- ================= COMMAND PALETTE ================= -->
+
+<div class="command-overlay" id="commandOverlay">
+
+    <div class="command-modal">
+
+        <div class="command-search">
+
+            <span>⌘</span>
+
+            <input
+                id="commandSearch"
+                placeholder="Search commands..."
+                autocomplete="off"/>
+
+        </div>
+
+        <div class="commands">
+
+            <div class="command"
+                 data-command="deploy">
+
+                <span>Deploy neural services</span>
+
+                <kbd>↵</kbd>
+
+            </div>
+
+            <div class="command"
+                 data-command="restart">
+
+                <span>Restart node cluster</span>
+
+                <kbd>R</kbd>
+
+            </div>
+
+            <div class="command"
+                 data-command="security">
+
+                <span>Run security scan</span>
+
+                <kbd>S</kbd>
+
+            </div>
+
+            <div class="command"
+                 data-command="metrics">
+
+                <span>Refresh system metrics</span>
+
+                <kbd>M</kbd>
+
+            </div>
+
+            <div class="command"
+                 data-command="clear">
+
+                <span>Clear terminal</span>
+
+                <kbd>C</kbd>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CLOCK
+   ========================================================= */
+
+const clock = document.getElementById("clock");
+
+function updateClock() {
+
+    const now = new Date();
+
+    clock.textContent =
+        now.toLocaleTimeString("en-GB");
+
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+
+/* =========================================================
+   LIVE METRICS
+   ========================================================= */
+
+const load = document.getElementById("load");
+const requests = document.getElementById("requests");
+const throughput = document.getElementById("throughput");
+
+function randomizeMetrics() {
+
+    const cpu =
+        65 + Math.random() * 12;
+
+    load.textContent =
+        cpu.toFixed(1) + "%";
+
+    const req =
+        284000 + Math.floor(Math.random() * 3000);
+
+    requests.textContent =
+        req.toLocaleString();
+
+    const tb =
+        82 + Math.random() * 5;
+
+    throughput.textContent =
+        tb.toFixed(2) + " TB";
+
+}
+
+setInterval(randomizeMetrics, 1800);
+
+
+/* =========================================================
+   SYSTEM RESOURCE ANIMATION
+   ========================================================= */
+
+function updateResource(idText, idBar, min, max) {
+
+    const value =
+        Math.floor(
+            min + Math.random() * (max - min)
+        );
+
+    document.getElementById(idText)
+        .textContent = value + "%";
+
+    document.getElementById(idBar)
+        .style.width = value + "%";
+}
+
+setInterval(() => {
+
+    updateResource(
+        "cpuText",
+        "cpuBar",
+        45,
+        92
+    );
+
+    updateResource(
+        "ramText",
+        "ramBar",
+        55,
+        88
+    );
+
+    updateResource(
+        "gpuText",
+        "gpuBar",
+        70,
+        98
+    );
+
+}, 2200);
+
+
+/* =========================================================
+   PARTICLE NETWORK
+   ========================================================= */
+
+const canvas =
+    document.getElementById("particles");
+
+const ctx =
+    canvas.getContext("2d");
+
+let particles = [];
+
+function resizeCanvas() {
+
+    canvas.width =
+        window.innerWidth;
+
+    canvas.height =
+        window.innerHeight;
+}
+
+resizeCanvas();
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+for(let i = 0; i < 75; i++) {
+
+    particles.push({
+
+        x: Math.random() *
+            window.innerWidth,
+
+        y: Math.random() *
+            window.innerHeight,
+
+        vx:
+            (Math.random() - .5)
+            * .25,
+
+        vy:
+            (Math.random() - .5)
+            * .25,
+
+        size:
+            Math.random() * 1.5 + .5
+    });
+}
+
+function animateParticles() {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    for(const p of particles) {
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if(p.x < 0 ||
+           p.x > canvas.width)
+            p.vx *= -1;
+
+        if(p.y < 0 ||
+           p.y > canvas.height)
+            p.vy *= -1;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            p.x,
+            p.y,
+            p.size,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fillStyle =
+            "rgba(92,225,255,.45)";
+
+        ctx.fill();
+    }
+
+    for(let i = 0; i < particles.length; i++) {
+
+        for(let j = i + 1;
+            j < particles.length;
+            j++) {
+
+            const a = particles[i];
+            const b = particles[j];
+
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+
+            const distance =
+                Math.sqrt(
+                    dx * dx + dy * dy
+                );
+
+            if(distance < 120) {
+
+                ctx.beginPath();
+
+                ctx.moveTo(a.x,a.y);
+
+                ctx.lineTo(b.x,b.y);
+
+                ctx.strokeStyle =
+                    `rgba(
+                        92,
+                        225,
+                        255,
+                        ${0.08 * (1-distance/120)}
+                    )`;
+
+                ctx.stroke();
+            }
+        }
+    }
+
+    requestAnimationFrame(
+        animateParticles
+    );
+}
+
+animateParticles();
+
+
+/* =========================================================
+   TERMINAL
+   ========================================================= */
+
+const terminal =
+    document.getElementById("terminal");
+
+const terminalInput =
+    document.getElementById("terminalInput");
+
+function terminalLog(
+    text,
+    type = "text"
+) {
+
+    const line =
+        document.createElement("div");
+
+    line.className =
+        "term-line";
+
+    const time =
+        new Date()
+        .toLocaleTimeString("en-GB");
+
+    line.innerHTML = `
+
+        <span class="term-time">
+            ${time}
+        </span>
+
+        <span class="term-prompt">
+            >
+        </span>
+
+        <span class="term-${type}">
+            ${text}
+        </span>
+    `;
+
+    terminal.appendChild(line);
+
+    terminal.scrollTop =
+        terminal.scrollHeight;
+}
+
+
+terminalInput.addEventListener(
+    "keydown",
+    e => {
+
+        if(e.key !== "Enter")
+            return;
+
+        const command =
+            terminalInput.value
+            .trim()
+            .toLowerCase();
+
+        if(!command)
+            return;
+
+        terminalLog(
+            "$ " + command
+        );
+
+        terminalInput.value = "";
+
+        setTimeout(() => {
+
+            switch(command) {
+
+                case "help":
+
+                    terminalLog(
+                        "commands: help, status, deploy, scan, clear",
+                        "success"
+                    );
+
+                    break;
+
+                case "status":
+
+                    terminalLog(
+                        "all systems operational",
+                        "success"
+                    );
+
+                    break;
+
+                case "deploy":
+
+                    terminalLog(
+                        "deployment pipeline started...",
+                        "warning"
+                    );
+
+                    setTimeout(() => {
+
+                        terminalLog(
+                            "deployment completed successfully",
+                            "success"
+                        );
+
+                    },1000);
+
+                    break;
+
+                case "scan":
+
+                    terminalLog(
+                        "scanning 48 security vectors...",
+                        "warning"
+                    );
+
+                    setTimeout(() => {
+
+                        terminalLog(
+                            "0 vulnerabilities detected",
+                            "success"
+                        );
+
+                    },1200);
+
+                    break;
+
+                case "clear":
+
+                    terminal.innerHTML = "";
+
+                    break;
+
+                default:
+
+                    terminalLog(
+                        "command not found — try 'help'",
+                        "error"
+                    );
+            }
+
+        },250);
+
+    }
+);
+
+
+/* =========================================================
+   ACTIVITY STREAM
+   ========================================================= */
+
+const activities = [
+
+    ["↯","Traffic spike detected"],
+
+    ["✓","Deployment completed"],
+
+    ["◈","Model synchronization complete"],
+
+    ["!","Anomalous request blocked"],
+
+    ["↻","Database replica synchronized"],
+
+    ["✓","Authentication service healthy"],
+
+    ["◉","New neural node connected"]
+
+];
+
+const activity =
+    document.getElementById("activity");
+
+setInterval(() => {
+
+    const data =
+        activities[
+            Math.floor(
+                Math.random() *
+                activities.length
+            )
+        ];
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "activity-item";
+
+    item.innerHTML = `
+
+        <div class="activity-icon">
+            ${data[0]}
+        </div>
+
+        <div class="activity-text">
+
+            <div class="activity-title">
+                ${data[1]}
+            </div>
+
+            <div class="activity-sub">
+                edge-node-${Math.floor(
+                    Math.random()*20
+                )
+                } · just now
+            </div>
+
+        </div>
+    `;
+
+    activity.prepend(item);
+
+    if(activity.children.length > 7)
+        activity.lastElementChild.remove();
+
+},3500);
+
+
+/* =========================================================
+   COMMAND PALETTE
+   ========================================================= */
+
+const overlay =
+    document.getElementById(
+        "commandOverlay"
+    );
+
+const commandSearch =
+    document.getElementById(
+        "commandSearch"
+    );
+
+
+function openCommandPalette() {
+
+    overlay.classList.add("active");
+
+    commandSearch.value = "";
+
+    setTimeout(
+        () => commandSearch.focus(),
+        50
+    );
+}
+
+
+function closeCommandPalette() {
+
+    overlay.classList.remove("active");
+
+}
+
+
+document.addEventListener(
+    "keydown",
+    e => {
+
+        if(
+            (e.ctrlKey || e.metaKey)
+            &&
+            e.key.toLowerCase() === "k"
+        ) {
+
+            e.preventDefault();
+
+            openCommandPalette();
+
+        }
+
+        if(e.key === "Escape")
+            closeCommandPalette();
+
+    }
+);
+
+
+overlay.addEventListener(
+    "click",
+    e => {
+
+        if(e.target === overlay)
+            closeCommandPalette();
+
+    }
+);
+
+
+/* =========================================================
+   COMMAND SEARCH
+   ========================================================= */
+
+commandSearch.addEventListener(
+    "input",
+    () => {
+
+        const query =
+            commandSearch.value
+            .toLowerCase();
+
+        document
+            .querySelectorAll(".command")
+            .forEach(command => {
+
+                command.style.display =
+                    command.textContent
+                    .toLowerCase()
+                    .includes(query)
+                    ? "flex"
+                    : "none";
+
+            });
+
+    }
+);
+
+
+/* =========================================================
+   COMMAND EXECUTION
+   ========================================================= */
+
+document
+.querySelectorAll(".command")
+.forEach(command => {
+
+    command.addEventListener(
+        "click",
+        () => {
+
+            const action =
+                command.dataset.command;
+
+            closeCommandPalette();
+
+            switch(action) {
+
+                case "deploy":
+
+                    terminalLog(
+                        "deployment initiated from command palette",
+                        "warning"
+                    );
+
+                    break;
+
+                case "restart":
+
+                    terminalLog(
+                        "cluster restart requested",
+                        "warning"
+                    );
+
+                    break;
+
+                case "security":
+
+                    terminalLog(
+                        "security scan started",
+                        "warning"
+                    );
+
+                    break;
+
+                case "metrics":
+
+                    randomizeMetrics();
+
+                    terminalLog(
+                        "metrics refreshed",
+                        "success"
+                    );
+
+                    break;
+
+                case "clear":
+
+                    terminal.innerHTML = "";
+
+                    break;
+
+            }
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   MOUSE PARALLAX
+   ========================================================= */
+
+document.addEventListener(
+    "mousemove",
+    e => {
+
+        const x =
+            (e.clientX /
+            window.innerWidth - .5);
+
+        const y =
+            (e.clientY /
+            window.innerHeight - .5);
+
+        document.body.style
+            .backgroundPosition =
+            `${x * 10}px ${y * 10}px`;
+
+    }
+);
+
+
+/* =========================================================
+   RANDOM TERMINAL EVENTS
+   ========================================================= */
+
+const events = [
+
+    ["edge node synchronized","success"],
+    ["cache invalidation completed","success"],
+    ["incoming request burst detected","warning"],
+    ["authentication token rotated","success"],
+    ["background worker spawned","success"],
+    ["packet anomaly analyzed","warning"]
+
+];
+
+setInterval(() => {
+
+    const event =
+        events[
+            Math.floor(
+                Math.random()*events.length
+            )
+        ];
+
+    terminalLog(
+        event[0],
+        event[1]
+    );
+
+},5000);
+
+</script>
+
+</body>
+</html>
